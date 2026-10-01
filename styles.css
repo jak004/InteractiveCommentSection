@@ -8,11 +8,12 @@
   button, textarea { font: inherit; color: inherit; }
   button { background: none; border: 0; padding: 0; cursor: pointer; }
   img { display: block; max-width: 100%; }
-  [hidden] { display: none; } /* no !important – author styles override UA */
+  [hidden] { display: none; }
 }
 
 @layer tokens {
   :root {
+    /* Colors */
     --purple-600: hsl(238 40% 52%);
     --purple-200: hsl(239 57% 85%);
     --pink-400: hsl(358 79% 66%);
@@ -22,22 +23,28 @@
     --grey-100: hsl(223 19% 93%);
     --grey-50: hsl(228 33% 97%);
     --white: hsl(0 0% 100%);
-    --overlay: hsl(0 0% 0% / 0.5);          /* ← extracted magic value */
+    --overlay: hsl(0 0% 0% / 0.5);
 
+    /* Typography & spacing */
     --font: "Rubik", system-ui, sans-serif;
-    --s1: 0.25rem; --s2: 0.5rem; --s3: 0.75rem;
-    --s4: 1rem; --s5: 1.5rem; --s6: 2rem;
+    --s1: 0.25rem;
+    --s2: 0.5rem;
+    --s3: 0.75rem;
+    --s4: 1rem;
+    --s5: 1.5rem;
+    --s6: 2rem;
     --radius: 0.5rem;
     --radius-sm: 0.125rem;
     --radius-md: 0.625rem;
     --ease: 150ms ease-out;
-    --wide: 30rem; /* a component's own width, not the viewport's, decides its layout */
+    --wide: 30rem;
 
-    /* fluid type scale */
-    --text-xs: clamp(0.625rem, 0.6rem + 0.15vw, 0.75rem);   /* ~0.6875rem */
-    --text-sm: clamp(0.75rem, 0.72rem + 0.2vw, 0.875rem);   /* ~0.8125rem */
-    --icon-sm: clamp(0.625rem, 0.6rem + 0.15vw, 0.75rem);   /* ~0.6875rem */
-    --icon: clamp(0.75rem, 0.72rem + 0.2vw, 0.9rem);        /* ~0.875rem */
+    /* Fluid sizes (replaces the 8 hard-coded rem values) */
+    --text-xs:  clamp(0.625rem, 0.58rem + 0.2vw, 0.75rem);   /* was 0.6875rem */
+    --text-sm:  clamp(0.75rem,  0.72rem + 0.2vw, 0.875rem);  /* was 0.8125rem */
+    --icon:     clamp(0.75rem,  0.72rem + 0.2vw, 0.9rem);    /* was 0.875rem */
+    --icon-sm:  clamp(0.625rem, 0.58rem + 0.2vw, 0.75rem);   /* was 0.6875rem */
+    --indent:   clamp(1.75rem, 1.5rem + 1vw, 2.75rem);        /* was 2.5rem */
   }
 }
 
@@ -48,10 +55,17 @@
     color: var(--grey-500);
     background: var(--grey-50);
   }
-  :focus-visible { outline: 2px solid var(--purple-600); outline-offset: 2px; }
+  :focus-visible {
+    outline: 2px solid var(--purple-600);
+    outline-offset: 2px;
+  }
   .visually-hidden {
-    position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden;
-    clip-path: inset(50%); white-space: nowrap;
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -69,45 +83,58 @@
     margin-inline: auto;
     padding-block: var(--s6) var(--s5);
   }
-  .thread, .comment__replies {
+  .thread,
+  .comment__replies {
     display: grid;
     gap: var(--s4);
     padding: 0;
     list-style: none;
   }
-  .comment { display: grid; gap: var(--s4); container-type: inline-size; }
+  .comment {
+    display: grid;
+    gap: var(--s4);
+    container-type: inline-size;
+  }
   .comment__replies {
     padding-inline-start: var(--s4);
     border-inline-start: 2px solid var(--grey-100);
   }
-  .composer { container-type: inline-size; }
+  .composer {
+    container-type: inline-size;
+  }
   .attribution {
     padding-block-end: var(--s5);
     font-size: var(--text-xs);
     text-align: center;
   }
-  .attribution a { color: var(--purple-600); }
+  .attribution a {
+    color: var(--purple-600);
+  }
+
   @container (min-width: var(--wide)) {
     .comment__replies {
-      margin-inline-start: 2.5rem;
-      padding-inline-start: 2.5rem;
+      margin-inline-start: var(--indent);
+      padding-inline-start: var(--indent);
     }
   }
 }
 
 @layer components {
-  /* Surface: the white panel shared by comments, composers and forms */
+  /* Surface */
   .surface {
     padding: var(--s4);
     background: var(--white);
     border-radius: var(--radius);
   }
 
-  /* Card: mobile-first grid; votes drop beside the content once the card is wide */
+  /* Card */
   .card {
     display: grid;
     grid-template-columns: 1fr auto;
-    grid-template-areas: "head head" "body body" "votes actions";
+    grid-template-areas:
+      "head head"
+      "body body"
+      "votes actions";
     gap: var(--s4);
     align-items: center;
   }
@@ -118,16 +145,27 @@
     align-items: center;
     gap: var(--s3);
   }
-  .card__body { grid-area: body; }
+  .card__body {
+    grid-area: body;
+  }
   .card__actions {
     grid-area: actions;
     display: flex;
     gap: var(--s4);
   }
-  .card__name { font-weight: 500; color: var(--grey-800); }
-  .card__text { overflow-wrap: anywhere; }
-  .mention { font-weight: 500; color: var(--purple-600); }
+  .card__name {
+    font-weight: 500;
+    color: var(--grey-800);
+  }
+  .card__text {
+    overflow-wrap: anywhere;
+  }
+  .mention {
+    font-weight: 500;
+    color: var(--purple-600);
+  }
 
+  /* Badge */
   .badge {
     padding: 0.125rem 0.4rem;
     font-size: var(--text-sm);
@@ -137,12 +175,14 @@
     border-radius: var(--radius-sm);
   }
 
+  /* Avatar */
   .avatar img {
     inline-size: 2rem;
     block-size: 2rem;
     border-radius: 50%;
   }
 
+  /* Votes */
   .votes {
     grid-area: votes;
     display: flex;
@@ -166,9 +206,11 @@
     transition: color var(--ease);
   }
   .votes__btn:hover,
-  .votes__btn[aria-pressed="true"] { color: var(--purple-600); }
+  .votes__btn[aria-pressed="true"] {
+    color: var(--purple-600);
+  }
 
-  /* Icons are masks, so one SVG takes any colour via currentColor */
+  /* Icons */
   .icon {
     flex: none;
     display: inline-block;
@@ -183,12 +225,13 @@
   .icon--delete { --icon: url("images/icon-delete.svg"); }
   .icon--plus,
   .icon--minus {
-    --icon: url("images/icon-plus.svg"); /* overridden below for minus */
     inline-size: var(--icon-sm);
     block-size: var(--icon-sm);
   }
+  .icon--plus  { --icon: url("images/icon-plus.svg"); }
   .icon--minus { --icon: url("images/icon-minus.svg"); }
 
+  /* Actions */
   .action {
     display: inline-flex;
     align-items: center;
@@ -198,10 +241,17 @@
     color: var(--purple-600);
     transition: color var(--ease);
   }
-  .action:hover { color: var(--purple-200); }
-  .action--danger { color: var(--pink-400); }
-  .action--danger:hover { color: var(--pink-200); }
+  .action:hover {
+    color: var(--purple-200);
+  }
+  .action--danger {
+    color: var(--pink-400);
+  }
+  .action--danger:hover {
+    color: var(--pink-200);
+  }
 
+  /* Buttons */
   .btn {
     padding: 0.75rem 1.5rem;
     font-weight: 500;
@@ -211,12 +261,23 @@
     border-radius: var(--radius);
     transition: background-color var(--ease);
   }
-  .btn:hover { background: var(--purple-200); }
-  .btn--neutral { background: var(--grey-500); }
-  .btn--neutral:hover { background: var(--grey-800); }
-  .btn--danger { background: var(--pink-400); }
-  .btn--danger:hover { background: var(--pink-200); }
+  .btn:hover {
+    background: var(--purple-200);
+  }
+  .btn--neutral {
+    background: var(--grey-500);
+  }
+  .btn--neutral:hover {
+    background: var(--grey-800);
+  }
+  .btn--danger {
+    background: var(--pink-400);
+  }
+  .btn--danger:hover {
+    background: var(--pink-200);
+  }
 
+  /* Textarea */
   .textarea {
     inline-size: 100%;
     min-block-size: 6rem;
@@ -226,30 +287,37 @@
     border: 1px solid var(--grey-100);
     border-radius: var(--radius);
   }
-  .textarea::placeholder { color: var(--grey-500); }
+  .textarea::placeholder {
+    color: var(--grey-500);
+  }
   .textarea:focus {
     outline: 0;
     border-color: var(--purple-600);
     box-shadow: 0 0 0 1px var(--purple-600);
   }
 
+  /* Composer */
   .composer__inner {
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
     gap: var(--s4);
-    grid-template-areas: "text text" "avatar btn";
+    grid-template-areas:
+      "text text"
+      "avatar btn";
   }
-  .composer__text { grid-area: text; }
+  .composer__text   { grid-area: text; }
   .composer__avatar { grid-area: avatar; }
-  .composer__btn { grid-area: btn; justify-self: end; }
+  .composer__btn    { grid-area: btn; justify-self: end; }
 
+  /* Edit form */
   .edit {
     display: grid;
     justify-items: end;
     gap: var(--s4);
   }
 
+  /* Dialog */
   .dialog {
     inline-size: min(100% - 2rem, 22.5rem);
     padding: var(--s6);
@@ -258,7 +326,9 @@
     border: 0;
     border-radius: var(--radius);
   }
-  .dialog::backdrop { background: var(--overlay); }
+  .dialog::backdrop {
+    background: var(--overlay);
+  }
   .dialog__title {
     margin-block-end: var(--s4);
     font-size: 1.25rem;
@@ -272,27 +342,46 @@
     margin-block-start: var(--s4);
   }
 
-  /* Wide variants: one query block, resolved against each component's own container */
+  /* Wide layout (container queries) */
   @container (min-width: var(--wide)) {
-    .surface { padding: var(--s5); }
+    .surface {
+      padding: var(--s5);
+    }
     .card {
       grid-template-columns: auto 1fr auto;
-      grid-template-areas: "votes head actions" "votes body body";
+      grid-template-areas:
+        "votes head actions"
+        "votes body body";
       column-gap: var(--s5);
       align-items: start;
     }
-    .card__head { align-self: center; }
-    .votes { flex-direction: column; align-self: start; }
+    .card__head {
+      align-self: center;
+    }
+    .votes {
+      flex-direction: column;
+      align-self: start;
+    }
     .composer__inner {
       grid-template-columns: auto 1fr auto;
       grid-template-areas: "avatar text btn";
       align-items: start;
     }
-    .composer__btn { justify-self: auto; }
+    .composer__btn {
+      justify-self: auto;
+    }
   }
 
+  /* Animation (respects reduced motion) */
   @media (prefers-reduced-motion: no-preference) {
-    .dialog[open] { animation: pop 150ms ease-out; }
-    @keyframes pop { from { opacity: 0; scale: 0.96; } }
+    .dialog[open] {
+      animation: pop 150ms ease-out;
+    }
+    @keyframes pop {
+      from {
+        opacity: 0;
+        scale: 0.96;
+      }
+    }
   }
 }
