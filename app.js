@@ -166,7 +166,7 @@ document.addEventListener('submit', e => {
 });
 
 dlg.addEventListener('close', () => {
-  if (dlg.returnValue === 'delete' && pending != null) {
+  if (dlg.returnValue === 'delete' && pending !== null) {
     const { c, list } = find(pending);
     list.splice(list.indexOf(c), 1);
     ui = {};
