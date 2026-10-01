@@ -3,7 +3,6 @@ const $ = (s, r = document) => r.querySelector(s);
 const root = $('#comments');
 const dlg = $('#delete-dialog');
 const tpl = id => $('#' + id).content.firstElementChild.cloneNode(true);
-
 const UNITS = [['year', 31536e6], ['month', 2592e6], ['week', 6048e5], ['day', 864e5], ['hour', 36e5], ['minute', 6e4]];
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'always' });
 const ago = ts => {
@@ -17,10 +16,8 @@ const parse = s => {
   const ms = m && UNITS.find(u => u[0] === m[2]);
   return ms ? Date.now() - m[1] * ms[1] : Date.now();
 };
-
 let state, pending = null;
 let ui = {}; // { mode: 'reply' | 'edit', id, draft, focus }
-
 const seed = d => {
   let max = 0;
   const fix = c => {
@@ -29,23 +26,26 @@ const seed = d => {
   };
   return { me: d.currentUser, comments: d.comments.map(fix), votes: {}, next: max + 1 };
 };
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} };
-
+const save = () => {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  } catch {
+    /* ignore storage errors (quota, private mode, etc.) */
+  }
+};
 const find = id => {
   for (const c of state.comments) {
     if (c.id === id) return { c, list: state.comments };
-    const r = c.replies.find(r => r.id === id);
+    const r = c.replies.find(reply => reply.id === id); // ← fixed shadowing
     if (r) return { c: r, list: c.replies, parent: c };
   }
 };
 const mention = c => (c.replyingTo ? `@${c.replyingTo} ` : '');
 const strip = (text, name) => (name ? text.replace(new RegExp(`^@${name}\\b[,:]?\\s*`), '') : text);
-
 const avatar = (el, u) => {
   $('source', el).srcset = u.image.webp;
   $('img', el).src = u.image.png;
 };
-
 const composer = (kind, value = '') => {
   const f = tpl('t-composer');
   f.dataset.kind = kind;
@@ -54,7 +54,6 @@ const composer = (kind, value = '') => {
   $('button', f).textContent = kind === 'comment' ? 'Send' : 'Reply';
   return f;
 };
-
 function node(c) {
   const li = tpl('t-comment');
   const mine = c.user.username === state.me.username;
@@ -66,7 +65,6 @@ function node(c) {
   t.dateTime = new Date(c.createdAt).toISOString();
   t.dataset.ts = c.createdAt;
   t.textContent = ago(c.createdAt);
-
   if (ui.mode === 'edit' && ui.id === c.id) {
     const f = tpl('t-edit');
     $('textarea', f).value = ui.draft ?? mention(c) + c.content;
@@ -81,7 +79,6 @@ function node(c) {
     }
     p.append(c.content);
   }
-
   $('.votes__score', li).textContent = c.score;
   const v = state.votes[c.id] || 0;
   $('[data-act=up]', li).setAttribute('aria-pressed', v === 1);
@@ -89,7 +86,6 @@ function node(c) {
   $('[data-act=reply]', li).hidden = mine;
   $('[data-act=delete]', li).hidden = !mine;
   $('[data-act=edit]', li).hidden = !mine;
-
   if (ui.mode === 'reply' && ui.id === c.id) {
     li.append(composer('reply', ui.draft ?? `@${c.user.username} `));
   }
@@ -101,7 +97,6 @@ function node(c) {
   }
   return li;
 }
-
 function render() {
   root.replaceChildren(...[...state.comments].sort((a, b) => b.score - a.score).map(node));
   if (ui.focus) {
@@ -111,7 +106,6 @@ function render() {
     ui.focus = false;
   }
 }
-
 function vote(id, dir) {
   const { c } = find(id);
   const prev = state.votes[id] || 0;
@@ -122,7 +116,6 @@ function vote(id, dir) {
   render();
   $(`[data-id="${id}"] [data-act=${dir === 1 ? 'up' : 'down'}]`, root)?.focus(); // keep keyboard position
 }
-
 root.addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
   if (!b) return;
@@ -133,11 +126,9 @@ root.addEventListener('click', e => {
   ui = ui.mode === act && ui.id === id ? {} : { mode: act, id, focus: true }; // click again to close
   render();
 });
-
 root.addEventListener('input', e => {
   if (e.target.matches('textarea')) ui.draft = e.target.value;
 });
-
 document.addEventListener('submit', e => {
   const f = e.target.closest('form[data-kind]');
   if (!f) return;
@@ -145,7 +136,6 @@ document.addEventListener('submit', e => {
   const ta = $('textarea', f);
   const kind = f.dataset.kind;
   let text = ta.value.trim();
-
   if (kind === 'comment') {
     if (!text) return ta.focus();
     state.comments.push({ id: state.next++, content: text, createdAt: Date.now(), score: 0, user: state.me, replies: [] });
@@ -164,7 +154,6 @@ document.addEventListener('submit', e => {
   render();
   if (kind === 'comment') ta.value = '';
 });
-
 dlg.addEventListener('close', () => {
   if (dlg.returnValue === 'delete' && pending !== null) {
     const { c, list } = find(pending);
@@ -175,13 +164,15 @@ dlg.addEventListener('close', () => {
   }
   pending = null;
 });
-
 setInterval(() => {
   document.querySelectorAll('time[data-ts]').forEach(t => (t.textContent = ago(+t.dataset.ts)));
 }, 30000);
-
 (async function init() {
-  try { state = JSON.parse(localStorage.getItem(KEY)); } catch {}
+  try {
+    state = JSON.parse(localStorage.getItem(KEY));
+  } catch {
+    /* ignore invalid / missing stored state */
+  }
   if (!state) {
     try {
       state = seed(await (await fetch('data.json')).json());
