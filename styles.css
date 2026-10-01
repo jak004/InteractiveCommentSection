@@ -1,0 +1,189 @@
+/* Cascade layers make precedence explicit: later layers win, regardless of
+   selector specificity. That lets every rule below stay at one class deep. */
+@layer reset, tokens, base, layout, components;
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  * { margin: 0; }
+  button, textarea { font: inherit; color: inherit; }
+  button { background: none; border: 0; padding: 0; cursor: pointer; }
+  img { display: block; max-width: 100%; }
+  [hidden] { display: none !important; }
+}
+
+@layer tokens {
+  :root {
+    --purple-600: hsl(238 40% 52%);
+    --purple-200: hsl(239 57% 85%);
+    --pink-400: hsl(358 79% 66%);
+    --pink-200: hsl(357 100% 86%);
+    --grey-800: hsl(212 24% 26%);
+    --grey-500: hsl(211 10% 45%);
+    --grey-100: hsl(223 19% 93%);
+    --grey-50: hsl(228 33% 97%);
+    --white: hsl(0 0% 100%);
+
+    --font: "Rubik", system-ui, sans-serif;
+    --s1: 0.25rem; --s2: 0.5rem; --s3: 0.75rem;
+    --s4: 1rem; --s5: 1.5rem; --s6: 2rem;
+    --radius: 0.5rem;
+    --ease: 150ms ease-out;
+    --wide: 30rem; /* a component's own width, not the viewport's, decides its layout */
+  }
+}
+
+@layer base {
+  body {
+    min-height: 100dvh;
+    font: 400 1rem/1.5 var(--font);
+    color: var(--grey-500);
+    background: var(--grey-50);
+  }
+  :focus-visible { outline: 2px solid var(--purple-600); outline-offset: 2px; }
+  .visually-hidden {
+    position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+}
+
+@layer layout {
+  .app {
+    display: grid;
+    gap: var(--s4);
+    inline-size: min(100% - 2rem, 41.25rem);
+    margin-inline: auto;
+    padding-block: var(--s6) var(--s5);
+  }
+  .thread, .comment__replies {
+    display: grid;
+    gap: var(--s4);
+    padding: 0;
+    list-style: none;
+  }
+  .comment { display: grid; gap: var(--s4); container-type: inline-size; }
+  .comment__replies {
+    padding-inline-start: var(--s4);
+    border-inline-start: 2px solid var(--grey-100);
+  }
+  .composer { container-type: inline-size; }
+  .attribution { padding-block-end: var(--s5); font-size: 0.6875rem; text-align: center; }
+  .attribution a { color: var(--purple-600); }
+
+  @container (min-width: 30rem) {
+    .comment__replies { margin-inline-start: 2.5rem; padding-inline-start: 2.5rem; }
+  }
+}
+
+@layer components {
+  /* Surface: the white panel shared by comments, composers and forms */
+  .surface { padding: var(--s4); background: var(--white); border-radius: var(--radius); }
+
+  /* Card: mobile-first grid; votes drop beside the content once the card is wide */
+  .card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "head head" "body body" "votes actions";
+    gap: var(--s4);
+    align-items: center;
+  }
+  .card__head { grid-area: head; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+  .card__body { grid-area: body; }
+  .card__actions { grid-area: actions; display: flex; gap: var(--s4); }
+  .card__name { font-weight: 500; color: var(--grey-800); }
+  .card__text { overflow-wrap: anywhere; }
+  .mention { font-weight: 500; color: var(--purple-600); }
+  .badge {
+    padding: 0.125rem 0.4rem; font-size: 0.8125rem; line-height: 1.2;
+    color: var(--white); background: var(--purple-600); border-radius: 0.125rem;
+  }
+  .avatar img { inline-size: 2rem; block-size: 2rem; border-radius: 50%; }
+
+  .votes {
+    grid-area: votes; display: flex; align-items: center; justify-self: start;
+    background: var(--grey-50); border-radius: 0.625rem;
+  }
+  .votes__score { min-inline-size: 1.5rem; font-weight: 500; text-align: center; color: var(--purple-600); }
+  .votes__btn {
+    display: grid; place-items: center; inline-size: 2.25rem; block-size: 2.25rem;
+    color: var(--purple-200); transition: color var(--ease);
+  }
+  .votes__btn:hover, .votes__btn[aria-pressed="true"] { color: var(--purple-600); }
+
+  /* Icons are masks, so one SVG takes any colour via currentColor (hover states for free) */
+  .icon {
+    flex: none; display: inline-block; inline-size: 0.875rem; block-size: 0.875rem;
+    background: currentColor;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+  }
+  .icon--reply { --icon: url("images/icon-reply.svg"); }
+  .icon--edit { --icon: url("images/icon-edit.svg"); }
+  .icon--delete { --icon: url("images/icon-delete.svg"); }
+  .icon--plus { --icon: url("images/icon-plus.svg"); inline-size: 0.6875rem; block-size: 0.6875rem; }
+  .icon--minus { --icon: url("images/icon-minus.svg"); inline-size: 0.6875rem; block-size: 0.6875rem; }
+
+  .action {
+    display: inline-flex; align-items: center; gap: var(--s2); padding: var(--s1);
+    font-weight: 500; color: var(--purple-600); transition: color var(--ease);
+  }
+  .action:hover { color: var(--purple-200); }
+  .action--danger { color: var(--pink-400); }
+  .action--danger:hover { color: var(--pink-200); }
+
+  .btn {
+    padding: 0.75rem 1.5rem; font-weight: 500; text-transform: uppercase; color: var(--white);
+    background: var(--purple-600); border-radius: var(--radius); transition: background-color var(--ease);
+  }
+  .btn:hover { background: var(--purple-200); }
+  .btn--neutral { background: var(--grey-500); }
+  .btn--neutral:hover { background: var(--grey-800); }
+  .btn--danger { background: var(--pink-400); }
+  .btn--danger:hover { background: var(--pink-200); }
+
+  .textarea {
+    inline-size: 100%; min-block-size: 6rem; padding: 0.75rem 1.25rem; resize: vertical;
+    color: var(--grey-800); border: 1px solid var(--grey-100); border-radius: var(--radius);
+  }
+  .textarea::placeholder { color: var(--grey-500); }
+  .textarea:focus { outline: 0; border-color: var(--purple-600); box-shadow: 0 0 0 1px var(--purple-600); }
+
+  .composer__inner {
+    display: grid; grid-template-columns: auto 1fr; align-items: center; gap: var(--s4);
+    grid-template-areas: "text text" "avatar btn";
+  }
+  .composer__text { grid-area: text; }
+  .composer__avatar { grid-area: avatar; }
+  .composer__btn { grid-area: btn; justify-self: end; }
+
+  .edit { display: grid; justify-items: end; gap: var(--s4); }
+
+  .dialog {
+    inline-size: min(100% - 2rem, 22.5rem); padding: var(--s6); margin: auto;
+    color: var(--grey-500); border: 0; border-radius: var(--radius);
+  }
+  .dialog::backdrop { background: hsl(0 0% 0% / 0.5); }
+  .dialog__title { margin-block-end: var(--s4); font-size: 1.25rem; font-weight: 500; color: var(--grey-800); }
+  .dialog__actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-block-start: var(--s4); }
+
+  /* Wide variants: one query block, resolved against each component's own container */
+  @container (min-width: 30rem) {
+    .surface { padding: var(--s5); }
+    .card {
+      grid-template-columns: auto 1fr auto;
+      grid-template-areas: "votes head actions" "votes body body";
+      column-gap: var(--s5); align-items: start;
+    }
+    .card__head { align-self: center; }
+    .votes { flex-direction: column; align-self: start; }
+    .composer__inner { grid-template-columns: auto 1fr auto; grid-template-areas: "avatar text btn"; align-items: start; }
+    .composer__btn { justify-self: auto; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .dialog[open] { animation: pop 150ms ease-out; }
+    @keyframes pop { from { opacity: 0; scale: 0.96; } }
+  }
+}
