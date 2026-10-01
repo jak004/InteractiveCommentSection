@@ -8,7 +8,7 @@
   button, textarea { font: inherit; color: inherit; }
   button { background: none; border: 0; padding: 0; cursor: pointer; }
   img { display: block; max-width: 100%; }
-  [hidden] { display: none !important; }
+  [hidden] { display: none ; }
 }
 
 @layer tokens {
@@ -45,7 +45,7 @@
     clip-path: inset(50%); white-space: nowrap;
   }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
+    *, *::before, *::after { animation: none ; transition: none ; }
   }
 }
 
