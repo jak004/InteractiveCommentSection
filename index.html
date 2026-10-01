@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,15 +19,13 @@
     <div id="new-comment"></div>
   </main>
 
- 
-
   <dialog class="dialog" id="delete-dialog" aria-labelledby="dialog-title">
-    <form method="dialog">
+    <form id="delete-form">
       <h2 class="dialog__title" id="dialog-title">Delete comment</h2>
       <p>Are you sure you want to delete this comment? This will remove the comment and can’t be undone.</p>
       <div class="dialog__actions">
-        <button class="btn btn--neutral" value="cancel">No, cancel</button>
-        <button class="btn btn--danger" value="delete">Yes, delete</button>
+        <button type="submit" class="btn btn--neutral" value="cancel">No, cancel</button>
+        <button type="submit" class="btn btn--danger" value="delete">Yes, delete</button>
       </div>
     </form>
   </dialog>
@@ -35,21 +34,68 @@
     <li class="comment">
       <article class="card surface">
         <header class="card__head">
-          <picture class="avatar"><source type="image/webp"><img alt="" width="32" height="32"></picture>
+          <picture class="avatar">
+            <source type="image/webp">
+            <img alt="" width="32" height="32">
+          </picture>
           <strong class="card__name"></strong>
           <span class="badge">you</span>
           <time class="card__time"></time>
         </header>
-        <div class="card__body"><p class="card__text"></p></div>
-        <div class="votes" role="group" aria-label="Score">
-          <button class="votes__btn" data-act="up" aria-label="Upvote"><span class="icon icon--plus" aria-hidden="true"></span></button>
-          <output class="votes__score"></output>
-          <button class="votes__btn" data-act="down" aria-label="Downvote"><span class="icon icon--minus" aria-hidden="true"></span></button>
+
+        <div class="card__body">
+          <p class="card__text"></p>
         </div>
+
+        <div class="votes" role="group" aria-label="Score">
+          <button
+            type="button"
+            class="votes__btn"
+            data-act="up"
+            aria-label="Upvote"
+          >
+            <span class="icon icon--plus" aria-hidden="true"></span>
+          </button>
+
+          <output class="votes__score"></output>
+
+          <button
+            type="button"
+            class="votes__btn"
+            data-act="down"
+            aria-label="Downvote"
+          >
+            <span class="icon icon--minus" aria-hidden="true"></span>
+          </button>
+        </div>
+
         <div class="card__actions">
-          <button class="action" data-act="reply"><span class="icon icon--reply" aria-hidden="true"></span>Reply</button>
-          <button class="action action--danger" data-act="delete"><span class="icon icon--delete" aria-hidden="true"></span>Delete</button>
-          <button class="action" data-act="edit"><span class="icon icon--edit" aria-hidden="true"></span>Edit</button>
+          <button
+            type="button"
+            class="action"
+            data-act="reply"
+          >
+            <span class="icon icon--reply" aria-hidden="true"></span>
+            Reply
+          </button>
+
+          <button
+            type="button"
+            class="action action--danger"
+            data-act="delete"
+          >
+            <span class="icon icon--delete" aria-hidden="true"></span>
+            Delete
+          </button>
+
+          <button
+            type="button"
+            class="action"
+            data-act="edit"
+          >
+            <span class="icon icon--edit" aria-hidden="true"></span>
+            Edit
+          </button>
         </div>
       </article>
     </li>
@@ -58,8 +104,18 @@
   <template id="t-composer">
     <form class="composer" data-kind="comment">
       <div class="composer__inner surface">
-        <picture class="avatar composer__avatar"><source type="image/webp"><img alt="" width="32" height="32"></picture>
-        <textarea class="textarea composer__text" rows="3" placeholder="Add a comment…" aria-label="Your comment"></textarea>
+        <picture class="avatar composer__avatar">
+          <source type="image/webp">
+          <img alt="" width="32" height="32">
+        </picture>
+
+        <textarea
+          class="textarea composer__text"
+          rows="3"
+          placeholder="Add a comment…"
+          aria-label="Your comment"
+        ></textarea>
+
         <button class="btn composer__btn" type="submit">Send</button>
       </div>
     </form>
@@ -67,9 +123,15 @@
 
   <template id="t-edit">
     <form class="edit" data-kind="edit">
-      <textarea class="textarea" rows="3" aria-label="Edit your comment"></textarea>
+      <textarea
+        class="textarea"
+        rows="3"
+        aria-label="Edit your comment"
+      ></textarea>
+
       <button class="btn" type="submit">Update</button>
     </form>
   </template>
 </body>
 </html>
+```
